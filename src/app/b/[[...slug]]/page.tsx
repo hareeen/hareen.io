@@ -5,8 +5,12 @@ import type { Metadata } from 'next';
 import { Post } from '@/components/layout/Post';
 import { MainLayout } from '@/components/layout/MainLayout';
 
-export async function generateMetadata(params: {
-  slug?: string[];
+export async function generateMetadata({
+  params,
+}: {
+  params: {
+    slug?: string[];
+  };
 }): Promise<Metadata> {
   const slug = params.slug ?? [];
   const isPost = await checkIfPostExists(slug);
