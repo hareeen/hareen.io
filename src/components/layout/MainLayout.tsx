@@ -1,7 +1,7 @@
+import { cn } from '@/lib/utils';
 import React from 'react';
 import { Footer } from './Footer';
 import { Header } from './Header';
-import { cn } from '@/lib/utils';
 
 export const MainLayout = React.forwardRef<
   HTMLDivElement,

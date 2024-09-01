@@ -1,9 +1,9 @@
 import { Directory } from '@/components/layout/Directory';
-import type { FrontMatter } from '@/lib/types';
-import { checkIfPostExists } from '@/lib/server-utils';
-import type { Metadata } from 'next';
-import { Post } from '@/components/layout/Post';
 import { MainLayout } from '@/components/layout/MainLayout';
+import { Post } from '@/components/layout/Post';
+import { checkIfPostExists } from '@/lib/server-utils';
+import type { FrontMatter } from '@/lib/types';
+import type { Metadata } from 'next';
 
 export async function generateMetadata({
   params,

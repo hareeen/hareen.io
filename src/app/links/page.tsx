@@ -1,6 +1,6 @@
-import Content from './content.mdx';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { ProseArticle } from '@/components/layout/ProseArticle';
+import Content from './content.mdx';
 
 export default function LinksPage() {
   return (

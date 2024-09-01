@@ -1,9 +1,9 @@
-import Content from './content.mdx';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { ProseArticle } from '@/components/layout/ProseArticle';
 import { DividerVerticalIcon } from '@radix-ui/react-icons';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Content from './content.mdx';
 
 export const metadata: Metadata = {
   title: '황수영 Suyoung Hwang',

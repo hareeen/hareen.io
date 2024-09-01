@@ -1,10 +1,8 @@
-import { Footer } from '@/components/layout/Footer';
-import { Header } from '@/components/layout/Header';
-import Content from './content.mdx';
-import { ArrowTopRightIcon, DividerVerticalIcon } from '@radix-ui/react-icons';
-import Link from 'next/link';
-import { ProseArticle } from '@/components/layout/ProseArticle';
 import { MainLayout } from '@/components/layout/MainLayout';
+import { ProseArticle } from '@/components/layout/ProseArticle';
+import { DividerVerticalIcon } from '@radix-ui/react-icons';
+import Link from 'next/link';
+import Content from './content.mdx';
 
 export default function Home() {
   return (
