@@ -42,7 +42,7 @@ export async function parsePostTree(slug: string[]) {
 
   try {
     const path = `${process.cwd()}/src/components/posts/${slug.join('/')}`;
-    return await transformTree(await scanAsync(path, { sorted: SortMethodPredefined.ALPHABETICAL }));
+    return await transformTree(await scanAsync(path, { sorted: SortMethodPredefined.ALPHABETICAL, showHidden: false }));
   } catch {
     return null;
   }
