@@ -6,7 +6,10 @@ export const ProseArticle = React.forwardRef<
   { className?: string } & React.ComponentPropsWithoutRef<'div'>
 >((props, ref) => {
   return (
-    <article className={cn(props.className, 'prose prose-zinc dark:prose-invert my-8 min-w-full')} ref={ref}>
+    <article
+      className={cn(props.className, 'md:prose prose-sm prose-zinc dark:prose-invert my-8 min-w-full')}
+      ref={ref}
+    >
       {props.children}
     </article>
   );
