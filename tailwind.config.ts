@@ -75,6 +75,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['var(--font-sans)', ...fontFamily.sans],
+        unset: 'this-is-a-dummy-value-to-unset-the-font-family',
       },
     },
   },
