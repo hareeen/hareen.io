@@ -7,7 +7,7 @@ export const ProseArticle = React.forwardRef<
 >((props, ref) => {
   return (
     <article
-      className={cn(props.className, 'md:prose prose-sm prose-zinc dark:prose-invert my-8 min-w-full')}
+      className={cn(props.className, 'prose print:prose max-md:prose-sm prose-zinc dark:prose-invert my-8 min-w-full')}
       ref={ref}
     >
       {props.children}
