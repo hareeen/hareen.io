@@ -69,7 +69,7 @@ export async function Directory(props: { slug: string[] }) {
         </tbody>
       </table>
       {traversal.length === 0 && (
-        <div className="text-sm w-full text-center text-muted-foreground mb-12">이곳엔 아무것도 없어요!</div>
+        <div className="md:text-sm text-xs w-full text-center text-muted-foreground mb-12">이곳엔 아무것도 없어요!</div>
       )}
     </ProseArticle>
   );
