@@ -14,12 +14,12 @@ export function Header() {
     <>
       <div className="hidden absolute top-8 right-0 print:block">
         <Link href="/">
-          <h3 className="text-xl font-bold">✦</h3>
+          <h3 className="text-xl font-bold font-['']">✦</h3>
         </Link>
       </div>
       <div className="my-4 flex items-center print:hidden">
         <Link href="/">
-          <h3 className="text-xl font-bold hover:text-[#7654ff] transition-all">✦</h3>
+          <h3 className="text-xl font-bold hover:text-[#7654ff] transition-all font-['']">✦</h3>
         </Link>
         <div className="flex-grow" />
         <DropdownMenu>

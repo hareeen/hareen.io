@@ -68,9 +68,10 @@
 @layer base {
   * {
     @apply border-border;
+    font-synthesis: none !important;
   }
   body {
-    @apply bg-background text-foreground break-keep antialiased;
+    @apply bg-background text-foreground break-keep;
   }
 }
 
