@@ -1,0 +1,115 @@
+---
+title: "Retrospect - FastMRI"
+date: "2024-09-02"
+---
+
+SNU FastMRI Challenge가 재밌어보여서(?) 타대생임에도 불구하고 (제출은 안 하고) 참가해보았다.
+코드는 [이 레포지토리](https://github.com/slowGPU/burning_gpu)에서 확인 가능하다.
+
+## 문제 정의
+
+빠르고 간단하지만 덜 정확하게 표현하면 빠르게 측정된 MRI 데이터로부터 고해상도 MRI 이미지를 복원하는 문제이다.
+
+길게 설명하면, multicoil MRI에서 x-space(image space)와 k-space 사이의 관계는 간단한 Fourier Transform으로 나타내진다. (notation의 편의를 위해서, spatial dimension은 적당히 moosh해서 flatten했다고 생각하자.)
+
+$$
+\mathbf{k}_i = \mathcal{F}(S_i\mathbf{x}) + \epsilon_i
+$$
+
+여기서 $S_i$는 sensitivity map이라고 하며, 각 coil이 image-space 상에서 어떤 기하학적 부분에 집중되어 있는지를 나타낸다. $S_i$가 scaling transform이어야 하므로, diagonal matrix로 나타낼 수 있다.
+$\epsilon_i$는 noise term이다. 더하여 regularization 조건으로, $S_i$는 다음을 만족한다.
+
+$$
+\sum{S_i^*S_i} = 1
+$$
+
+**풀어야 할 task는, $\mathbf{k}_i$를 mask한 $\tilde{\mathbf{k}}_i$가 주어졌을 때, $x_i$를 복원하는 문제이다.**
+
+
+
+
+## 수행 과정
+
+### 데이터 준비
+
+데이터가 300GB(...)이다. 우선 Google Drive에 올려 놓고, 필요할 때마다 volume mount해서 사용했다.
+[vast.ai](https://vast.ai)에서 서버를 필요할 때만 빌려야 하다 보니, 컨테이너로 개발 환경을 세팅하여야 했다.
+
+### 컨테이너 세팅
+
+Docker로 컨테이너를 세팅했다. PyTorch, CUDA, cuDNN이 설치되어 있는 base image를 사용했다. 그리고 필요한 패키지들을 설치했다.
+
+다만, 필요한 패키지를 설치하기 위한 `requirements.txt`가 private repository에 있었기 때문에,
+컨테이너 빌드를 Github Actions로 자동화하였으며, 의존성 파일만 sparse-checkout하여 사용하였다.
+
+또한, [MLFlow](https://mlflow.org/)를 사용하여 실험을 관리하였고, 이를 위해 컨테이너의 포트를 열어두었다.
+
+대강의 구조는 다음과 같다.
+
+```yaml title="github/workflows/[action-name].yml" {5-7}
+- uses: actions/checkout@v4
+  with:
+    repository: slowGPU/burning_gpu
+    path: burning_gpu
+    token: ${{ secrets.GH_PAT }}
+    sparse-checkout: |
+      requirements.txt
+```
+
+```dockerfile title="Dockerfile"
+FROM pytorch/pytorch:2.3.1-cuda12.1-cudnn8-runtime
+
+# install requirements
+COPY ./burning_gpu/requirements.txt ./requirements.txt
+RUN pip install -r requirements.txt
+RUN rm requirements.txt
+
+# open port for mlflow
+EXPOSE 5000
+```
+
+### Baseline(VarNet) 구현 및 리팩토링
+
+[VarNet](https://arxiv.org/abs/2004.06688)을 구현하고, 실험을 진행하였다.
+[Pytorch Lightning](https://lightning.ai/docs/pytorch/stable/)으로 리팩토링을 진행하였고, MLFlow auto-logging을 사용하여 실험을 관리하였다.
+
+추상 클래스를 만들어 Pytorch Lightning의 `LightningModule`을 상속받아 사용하였다.
+
+### 모델 개선
+
+VarNet은 크게 두 가지 구조, cascade와 sensitivity map estimation(SME)으로 이루어져 있고, cascade는 다시 refinement(R)과 data consistency(DC)로 이루어져 있다.
+k-space를 x-space로 aggregation하거나, x-space를 다시 k-space로 분리하는 작업을 할 때 R과 DC에서 SME의 결과인 sens map이 사용된다.
+
+R 블록과 SME 블록은 모두 x-space에서 transfer하는 backbone network를 사용하며, U-Net을 주로 사용한다.
+DC 블록은 k-space에서의 residual connection을 담당한다.
+
+모델 개선에서 집중했던 포인트들이다.
+
+#### SME 개선
+
+4 cascade VarNet에서 sens map이 원본 이미지의 구조를 투영하는 문제를 보였다.
+어라? 이건 좋은 거 아닌가? 라는 생각이 든다면, 원래 sens map은 장비의 특성에 따라 달라지는데, 이를 학습하는 것이 아니라 이미지의 특성을 학습하면 overfitting이라는 것이다.
+
+이걸 해결하기 위해 backbone을 U-Net에서 매뉴얼하게 mixed logistic distribution을 사용하는 방법으로 바꾸었는데, 괄목할 만한 성능 향상을 보였다.
+
+하지만, cascade 수가 12 cascade 이상으로 늘어나면 오히려 U-Net이 잘 작동하는 것을 확인할 수 있었다.
+
+#### Shared Cascades
+
+R 블록의 U-Net이 담당하는 역할은 간단하다. x-space에서의 denoising, super-resolution, 아무튼 그런 것들.
+그렇다면 이들이 굳이 다른 파라미터를 가질 필요가 있을까? U-Net은 상당히 잘 transfer되는 구조이므로, cascade 간에 파라미터를 공유해도 성능에 큰 영향을 미치지 않을 것으로 기대했다.
+
+이를 적용해본 결과, 4 cascade에서는 SME 블록의 성능까지 향상시킬 수 있었으나, cascade가 많아질수록 성능 향상이 적었다. (성능이 떨어지지는 않았다.)
+
+#### Postprocessing
+
+[NAFNet](https://arxiv.org/abs/2204.04676)이나 [Restormer](https://arxiv.org/abs/2111.09881)를 뒤에 붙여보았다.
+물론 성능은 향상되었지만, 이들은 이미지의 특성만 학습하기 때문에 그 향상폭이 일정 수준 이상으로는 높지 않았다.
+
+
+## 넋두리
+
+비록 좋은 메트릭을 보이지는 못했지만, 그래도 프로젝트 관리의 측면에서는 많은 것을 배울 수 있었다.
+특히, Github Actions를 이용한 CI/CD, MLFlow를 이용한 실험 관리, Pytorch Lightning을 이용한 모델 구조화 등이다.
+
+사실 shared cascade 방법론을 발전시켜서 step에 관련된 context를 넣어서 recurrent한 구조를 만들어보는 등의 개선이 가능할 것으로 보이고, 아마 여유가 된다면 이를 시도해보고 싶다.

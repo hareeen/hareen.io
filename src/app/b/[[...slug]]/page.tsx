@@ -22,6 +22,7 @@ export async function generateMetadata({
     frontmatter.date = new Date(frontmatter.date);
 
     return {
+      title: frontmatter.title,
       openGraph: {
         type: 'article',
         title: frontmatter.title,
@@ -35,11 +36,12 @@ export async function generateMetadata({
   }
   if (slug.length > 0) {
     return {
+      title: `blog - ${slug[slug.length - 1]}`,
       openGraph: {
-        title: slug[slug.length - 1],
+        title: `blog - ${slug[slug.length - 1]}`,
       },
       twitter: {
-        title: slug[slug.length - 1],
+        title: `blog - ${slug[slug.length - 1]}`,
       },
     };
   }

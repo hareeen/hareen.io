@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
+import 'katex/dist/katex.min.css';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { cn } from '@/lib/utils';
-import Head from 'next/head';
 
 const wantedSans = localFont({
   src: '../../public/fonts/WantedSansVariable.woff2',
@@ -55,13 +55,6 @@ export default function RootLayout({
 }>): React.ReactElement {
   return (
     <html lang="ko">
-      <Head>
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css"
-          integrity="sha384-wcIxkf4k558AjM3Yz3BBFQUbk/zgIYC2R0QpeeYb+TwlBVMrlgLqwRjRtGZiK7ww"
-        />
-      </Head>
       <body className={cn('min-h-screen bg-background font-sans antialiased', wantedSans.variable)}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {children}

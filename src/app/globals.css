@@ -150,12 +150,6 @@
   @apply mt-0 rounded-t-none;
 }
 
-/* katex */
-
-.katex-display .katex *[aria-hidden] {
-  @apply hidden;
-}
-
 ::selection {
   @apply bg-opacity-50 bg-[#7654ff];
 }

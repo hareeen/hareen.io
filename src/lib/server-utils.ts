@@ -24,6 +24,7 @@ export async function parsePostTree(slug: string[]) {
     if (current.type === Type.FILE) {
       const file = Bun.file(current.path);
       const frontmatter = fm<FrontMatter>(await file.text()).attributes;
+      frontmatter.date = new Date(frontmatter.date);
 
       return {
         name: current.name,

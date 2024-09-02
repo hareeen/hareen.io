@@ -13,6 +13,7 @@ const UtterancesComments: React.FC<{ theme: string }> = (props) => (
       scriptElem.setAttribute('repo', 'hareeen/utterances');
       scriptElem.setAttribute('issue-term', 'pathname');
       scriptElem.setAttribute('theme', props.theme);
+      if (elem.firstChild) elem.removeChild(elem.firstChild);
       elem.appendChild(scriptElem);
     }}
   />
