@@ -35,7 +35,7 @@ export async function Post(props: { slug: string[] }) {
         ))}
       </p>
       <h1 className="mt-2 mb-0">{frontmatter.title}</h1>
-      <p className="text-muted-foreground text-sm mt-2 mb-6 font-medium">
+      <p className="text-muted-foreground text-sm mt-2 mb-6 font-medium print:hidden">
         {DateTime.fromJSDate(frontmatter.date)
           .setLocale((header.get('Accept-Language')?.split(',') ?? ['ko-KR'])[0])
           .toLocaleString(DateTime.DATE_MED)}

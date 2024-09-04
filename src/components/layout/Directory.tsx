@@ -52,12 +52,14 @@ export async function Directory(props: { slug: string[] }) {
             return (
               <tr key={`row-${pt.relativePath}`}>
                 <td>
-                  <Link href={`/b/${slug_inner.join('/')}`}>
-                    <Icon className="inline-block mr-2" style={{ marginLeft: `${1.5 * (depth - 1)}rem` }} />
-                    {title}
-                  </Link>
+                  <div style={{ paddingLeft: `${1.5 * (depth - 1)}rem` }}>
+                    <Link href={`/b/${slug_inner.join('/')}`}>
+                      <Icon className="inline-block mr-2" />
+                      {title}
+                    </Link>
+                  </div>
                 </td>
-                <td className="text-right">
+                <td className="text-right md:min-w-28 min-w-24">
                   {pt.type === Type.FILE &&
                     DateTime.fromJSDate(pt.frontmatter.date)
                       .setLocale((header.get('Accept-Language')?.split(',') ?? ['ko-KR'])[0])
