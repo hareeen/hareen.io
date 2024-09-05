@@ -15,7 +15,7 @@ export default function Home() {
           <DividerVerticalIcon className="inline w-4 h-4" />
           <Link href="/links">연락처 및 링크</Link>
           <DividerVerticalIcon className="inline w-4 h-4" />
-          <Link href="/b">블로그 (공사 중)</Link>
+          <Link href="/b">블로그</Link>
         </p>
       </ProseArticle>
     </MainLayout>
