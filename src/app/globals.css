@@ -150,6 +150,16 @@
   @apply mt-0 rounded-t-none;
 }
 
+/* katex */
+
+.prose .katex-display {
+  @apply overflow-x-scroll overflow-y-clip;
+}
+
+.prose .katex-mathml {
+  @apply hidden;
+}
+
 ::selection {
   @apply bg-opacity-50 bg-[#7654ff];
 }
