@@ -34,7 +34,7 @@ export async function Post(props: { slug: string[] }) {
           </Fragment>
         ))}
       </p>
-      <h1 className="mt-2 max-md:mt-1.5 mb-0 max-md:mb-0">{frontmatter.title}</h1>
+      <h1 className="mt-2 max-md:mt-1.5 mb-0 max-md:mb-0 print:mb-2 print:max-md:mb-1.5">{frontmatter.title}</h1>
       <p className="text-muted-foreground md:text-sm text-xs mt-2 max-md:mt-1.5 mb-6 max-md:mb-5 font-medium print:hidden">
         {DateTime.fromJSDate(frontmatter.date)
           .setLocale((header.get('Accept-Language')?.split(',') ?? ['ko-KR'])[0])
