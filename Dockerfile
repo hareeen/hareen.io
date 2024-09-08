@@ -3,7 +3,7 @@ FROM oven/bun:alpine
 COPY . .
 
 RUN bun install
-RUN bunx --bun next build
+RUN bun --bun run build
 
 EXPOSE 3000
-CMD ["bunx", "--bun", "next", "start"]
+CMD ["bun", "--bun", "run", "start"]
