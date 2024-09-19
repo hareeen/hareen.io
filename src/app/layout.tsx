@@ -41,7 +41,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    site: 'https://blog.hareen.io',
+    site: 'https://hareen.io',
     creator: '@_hareeen',
     title: '✦☁️',
     description: 'shine; consolingly but extraordinarily',
