@@ -13,7 +13,7 @@ export function Footer() {
           Github
         </a>
         {' · '}
-        <a className="hover:underline" href="mailto:me@hareen.io">
+        <a className="hover:underline" href="mailto:work@hareen.io">
           Mail
         </a>
       </p>
