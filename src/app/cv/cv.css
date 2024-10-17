@@ -1,0 +1,7 @@
+.prose p:has(+ ul) {
+  @apply mb-0;
+}
+
+.prose p + ul {
+  @apply mt-0;
+}

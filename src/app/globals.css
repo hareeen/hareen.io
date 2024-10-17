@@ -160,6 +160,12 @@
   @apply hidden;
 }
 
+/* misc */
+
+.prose strong a {
+  @apply font-semibold;
+}
+
 ::selection {
   @apply bg-opacity-50 bg-[#7654ff];
 }
