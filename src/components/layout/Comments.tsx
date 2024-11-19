@@ -1,11 +1,12 @@
 'use client';
 
-const UtterancesComments: React.FC<{ theme: string }> = (props) => (
+const UtterancesComments = (props: { theme: string }) => (
   <section
     ref={(elem) => {
-      if (!elem) {
+      if (!elem || document.visibilityState === 'hidden') {
         return;
       }
+
       const scriptElem = document.createElement('script');
       scriptElem.src = 'https://utteranc.es/client.js';
       scriptElem.async = true;
@@ -13,6 +14,7 @@ const UtterancesComments: React.FC<{ theme: string }> = (props) => (
       scriptElem.setAttribute('repo', 'hareeen/utterances');
       scriptElem.setAttribute('issue-term', 'pathname');
       scriptElem.setAttribute('theme', props.theme);
+      
       if (elem.firstChild) elem.removeChild(elem.firstChild);
       elem.appendChild(scriptElem);
     }}

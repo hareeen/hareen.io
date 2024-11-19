@@ -5,13 +5,14 @@ import { checkIfPostExists } from '@/lib/server-utils';
 import type { FrontMatter } from '@/lib/types';
 import type { Metadata } from 'next';
 
-export async function generateMetadata({
-  params,
-}: {
-  params: {
-    slug?: string[];
-  };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{
+      slug?: string[];
+    }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
   const slug = params.slug ?? [];
   const isPost = await checkIfPostExists(slug);
 
@@ -49,11 +50,12 @@ export async function generateMetadata({
   return {};
 }
 
-export default async function PostPage({
-  params,
-}: {
-  params: { slug?: string[] };
-}) {
+export default async function PostPage(
+  props: {
+    params: Promise<{ slug?: string[] }>;
+  }
+) {
+  const params = await props.params;
   const slug = params.slug ?? [];
 
   const isPost = await checkIfPostExists(slug);

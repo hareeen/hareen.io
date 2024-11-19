@@ -9,7 +9,7 @@ import { Fragment } from 'react';
 import { ProseArticle } from './ProseArticle';
 
 export async function Directory(props: { slug: string[] }) {
-  const header = headers();
+  const header = await headers();
 
   const postTree = await parsePostTree(props.slug);
 

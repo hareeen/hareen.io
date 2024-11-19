@@ -9,7 +9,7 @@ import { Comments } from './Comments';
 import { ProseArticle } from './ProseArticle';
 
 export async function Post(props: { slug: string[] }) {
-  const header = headers();
+  const header = await headers();
 
   const { default: Post, frontmatter } = (await import(`@/components/posts/${props.slug.join('/')}.mdx`)) as {
     default: MDXContent;

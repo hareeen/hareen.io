@@ -4,7 +4,7 @@ import { DividerVerticalIcon } from '@radix-ui/react-icons';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Content from './content.mdx';
-import './cv.css'
+import './cv.css';
 
 export const metadata: Metadata = {
   title: '황수영 Suyoung Hwang',
