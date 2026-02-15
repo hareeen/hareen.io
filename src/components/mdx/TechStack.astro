@@ -1,0 +1,14 @@
+---
+
+
+
+import { cn } from "@/lib/utils";
+
+interface Props {
+    class?: string;
+}
+---
+
+<span class={cn(Astro.props.class, "text-[75%] block font-semibold")}>
+    <slot />
+</span>

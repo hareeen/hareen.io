@@ -1,0 +1,31 @@
+<!-- Light theme comments -->
+<div class="block dark:hidden">
+    <section class="utterances-light"></section>
+</div>
+<!-- Dark theme comments -->
+<div class="hidden dark:block">
+    <section class="utterances-dark"></section>
+</div>
+
+<script>
+    function loadUtterances(container: Element, theme: string) {
+        if (!container || document.visibilityState === "hidden") return;
+
+        const script = document.createElement("script");
+        script.src = "https://utteranc.es/client.js";
+        script.async = true;
+        script.crossOrigin = "anonymous";
+        script.setAttribute("repo", "hareeen/utterances");
+        script.setAttribute("issue-term", "pathname");
+        script.setAttribute("theme", theme);
+
+        if (container.firstChild) container.removeChild(container.firstChild);
+        container.appendChild(script);
+    }
+
+    const lightContainer = document.querySelector(".utterances-light");
+    const darkContainer = document.querySelector(".utterances-dark");
+
+    if (lightContainer) loadUtterances(lightContainer, "github-light");
+    if (darkContainer) loadUtterances(darkContainer, "github-dark");
+</script>

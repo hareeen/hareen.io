@@ -1,0 +1,13 @@
+---
+import { cn } from "@/lib/utils";
+
+interface Props {
+    class?: string;
+}
+---
+
+<span
+    class={cn(Astro.props.class, "text-muted-foreground float-end text-right")}
+>
+    <slot />
+</span>

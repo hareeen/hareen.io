@@ -1,0 +1,577 @@
+---
+title: "FFXIV - 정량적으로 방어하기"
+date: "2024-11-19"
+---
+
+## 들어가기에 앞서
+
+하드 컨텐츠를 해 본 사람들이라면, 장비를 맞추어야 한다는 사실 정도는 상식으로 아실 것입니다.
+
+하지만, 이 질문들은 여전히 모호하게 느껴지죠.
+
+* 장비를 맞추는 것은 어느 정도로 중요할까요?
+* '장비를 맞추라'는 피드백은 과연 그 정도로 유효한 것이었을까요?
+* 몇 번씩 사사게를 뒤엎는 장비불량과 정치질 이슈, 과연 정말 장비가 문제였을까요?
+
+그리고, 힐러들.. 혹은 파티의 목숨줄을 잡고 있는 다른 직업에게는 또 다른 궁금증이 있습니다. (아마 공감가실 거라 믿습니다.)
+
+* 회복량을 높이려면 무엇을 해야 할까요?
+* 금단은 HP나 방어력과 연관이 있을까요?
+* 직군별로 누가 더 아프게 맞을까요?
+
+이런 궁금증을 해소하기 위해, 약간의 계산을 해보려고 합니다.
+
+### 목적
+
+이 글의 목적은 **아이템 레벨로부터 HP와 회복량을 대충 추정**하는 것입니다.\
+또한, 아이템 레벨에 따라 방어력의 변화를 살펴보려 합니다.
+
+즉, 조금 더 간단하게 말하면 이 글에서 다룰 내용은
+* **탱커와 힐러의 HP를 계산해 보자.**
+* **탱커와 힐러의 회복력 100에 해당하는 회복량을 계산해 보자.**
+* 각 직군의 방어력을 알아보자.
+
+정도로 정리할 수 있을 것 같습니다.
+
+### 구조 살펴보기
+
+대략적인 수치들 사이의 연관관계는 다음과 같습니다.
+
+먼저, 유저가 조작할 수 있는 변인인 **장비, 파티 보너스, 음식**를 조정하게 되면 이것으로부터 (산술적 합 등의 간단한 방법으로)
+우리가 흔히 '스탯'이라고 부르는 **주 스탯(Main), 무기 데미지(WD), VIT(활력), DET(의지), TEN(불굴)** 이 계산됩니다.
+여기서 주 스탯은 **힘, 활력, 민첩성, 정신력, 지능 중 하나**를 의미합니다.
+
+물론, CRT(극대화), DH(직격), SKS(기술 시전 속도), SPS(마법 시전 속도) 등의 스탯도 있고 이들은 피해량의 계산에서는 매우 중요하지만, 여기서는 다루지 않겠습니다.
+
+또한, 각각의 수치는 그 수치로부터 계산되는 배율이 존재합니다. 이 배율은 위의 스탯들에 대한 일종의 함수라고 볼 수 있고, 산술적 합보다는 약간 복잡한 식으로 계산되어 **직접적으로 받는 데미지량, 회복량 등에 곱해지는 값**입니다.
+
+예를 들어, **주 스탯 배율**은 주 스탯, 레벨 기본 상수, 탱커 여부 등으로부터 계산되는 값이며, **무기 데미지 배율**은 무기 데미지, 직업 기본 상수, 레벨 기본 상수 등으로부터 계산되는 값입니다.
+동일한 방식으로 **의지 배율**, **불굴 배율** 등이 존재합니다. 여기서 레벨 기본 상수는 레벨에 따라 고정된 상수, 직업 기본 상수는 직업에 따라 고정된 상수이며, 조금 더 자세한 내용은 아래에서 다루겠습니다.
+
+우리가 최종적으로 목적으로 하는 수치인 **HP**는 결론적으로 활력, 레벨 기본 상수, 직업 기본 상수, 탱커 여부 등으로부터 계산되며, **회복량**은 주 스탯 배율, 무기 데미지 배율, 의지 배율, 불굴 배율 등으로부터 계산됩니다.
+
+## 기본 상수
+
+파이널판타지14의 계산식에서는 장비 스탯에 영향을 받지 않고, 레벨이나 직업, 종족 등에 의해 결정되는 상수가 존재합니다. 실질적 의미는 적은 편이지만, 아래에 다룰 계산식에는 필수적인 요소입니다.
+
+직관적으로는 아마 여러분도 모두 아시는 파티 보너스나 음식의 효과와 같은 것들이 이에 해당합니다. 물론 직관과 조금 멀리 있는 복잡한 상수들도 존재합니다.
+
+### 파티 보너스
+
+파티 내에 있는 역할군 종류 하나마다, 모든 파티원의 주 스탯(힘, 활력, 민첩성, 정신력, 지능)이 1%씩 증가합니다.
+
+역할군이 최대 5종류(탱커, 힐러, 근딜, 캐스터, 유격대)이므로, 최대 5%까지 증가하게 됩니다.
+
+### 음식
+
+음식은 플레이어의 **활력**을 상승시킵니다. 이외에도 의지, 극대화 등의 스탯이 증가하지만, 이는 여기서는 다루지 않겠습니다.
+
+음식에 의한 보너스는 **10% 상승**과 음식마다 다른 **고정값 상승** 중 더 불리한 쪽이 적용됩니다. 또한 레벨 조율이 적용되지 않으므로, 그 상승치는 게임 버전에 따라서만 결정되게 됩니다.
+
+예시로, 패치 6.4와 7.0에서의 음식 상승치는 다음과 같습니다.
+
+| Version | Subversion | Max (VIT) | Ratio (VIT) |
+| ------- | ---------- | --------- | ----------- |
+| 6       | 4          | 143       | 1.1         |
+| 7       | 0          | 177       | 1.1         |
+
+### 레벨 기본 상수
+
+다음은 레벨에 따라 변화하는 상수입니다. 이는 레벨이 증가함에 따라 증가하는 상수이며, 레벨이 증가할수록 상수가 증가하는 경향을 보입니다.
+
+앞으로 등장할 식에서 아랫첨자가 $l$인 경우, 이는 레벨에 따라 변화하는 상수를 의미합니다.
+
+<div className="overflow-x-scroll max-w-full [&>*]:my-0">
+| Level | $B_l^M$ | $B_l^S$ | $\alpha_l$ | $\alpha_l^T$ | $\gamma_l$ | $H_l$ | $\beta_{l}$ | $\beta_{l}^T$ |
+| ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
+| 70 | 292 | 364 | 125 | 105 | 900 | 1700 | 14 | 18.8 |
+| 80 | 340 | 380 | 165 | 115 | 1300 | 2000 | 18.8 | 26.6 |
+| 90 | 390 | 400 | 195 | 156 | 1900 | 3000 | 24.3 | 34.6 |
+| 100 | 440 | 420 | 237 | 190 | 2780 | 4000 | 30.1 | 43 |
+</div>
+
+### 직업 기본 상수
+
+다음은 직업에 따라 변화하는 상수입니다. 이는 직업이 변화함에 따라 변화하는 상수이며, 직업이 변화할수록 상수가 변화하는 경향을 보입니다.
+
+앞으로 등장할 식에서 아랫첨자가 $j$인 경우, 이는 직업에 따라 변화하는 상수를 의미합니다.
+
+| Job  | Aff. Stat | $\eta_j$ | $\mu_j$ | $\nu_j$ |
+| ---- | --------- | -------- | ------- | ------- |
+| PLD  | STR, TEN  | 140      | 100     | 110     |
+| WAR  | STR, TEN  | 145      | 105     | 110     |
+| DRK  | STR, TEN  | 140      | 105     | 110     |
+| GNB  | STR, TEN  | 140      | 100     | 110     |
+| WHM  | MND       | 105      | 115     | 100     |
+| SCH  | MND       | 105      | 115     | 100     |
+| AST  | MND       | 105      | 115     | 100     |
+| SGE  | MND       | 105      | 115     | 100     |
+| MNK  | STR       | 110      | 110     | 100     |
+| DRG  | STR       | 115      | 115     | 105     |
+| NIN  | DEX       | 108      | 110     | 100     |
+| SAM  | STR       | 109      | 112     | 100     |
+| RPR  | STR       | 115      | 115     | 105     |
+| VPR  | DEX       | 111      | 110     | 100     |
+| BRD  | DEX       | 105      | 115     | 100     |
+| MCH  | DEX       | 105      | 115     | 100     |
+| DNC  | DEX       | 105      | 115     | 100     |
+| BLM  | INT       | 105      | 115     | 100     |
+| SMN  | INT       | 105      | 115     | 100     |
+| RDM  | INT       | 105      | 115     | 100     |
+| PCT  | INT       | 105      | 115     | 100     |
+| BLU  | INT       | 105      | 115     | 100     |
+
+
+## 공식
+
+이 섹션에서는 스탯으로부터 배율이 계산되는 과정을 거쳐, 최종적으로 HP와 회복량이 계산되는 과정을 다룹니다.
+
+이 섹션의 내용은 AkhMorning의 [Allagan Studies](https://www.akhmorning.com/allagan-studies/)에서 가져왔으며, 제가 인게임에서 대강이나마 공식의 유효성을 확인하고 여기에 조금이나마 알기 쉽게 설명하려고 노력했습니다.
+
+### HP
+
+$$
+\begin{align*}
+\text{HP}^\text{Tank}(v, l, j) &= \left\lfloor\frac{H_l\eta_j}{100}\right\rfloor + \left\lfloor (v - B_{l}^M)\beta_l^T\right\rfloor\\
+\text{HP}^\text{DPS, Healer}(v, l, j) &= \left\lfloor\frac{H_l\eta_j}{100}\right\rfloor + \left\lfloor (v - B_{l}^M)\beta_l\right\rfloor
+\end{align*}
+$$
+
+$v$, $l$, $j$는 각각 활력, 레벨, 직업을 나타냅니다.
+
+신기하게도, **HP는 활력에 의해서만 결정되며, 다른 스탯에는 영향을 받지 않습니다.**
+
+살짝 비직관적이지만, 유격대 직군이 다른 딜러 및 힐러에 비해 HP가 높은 것은, 활력 스탯이 높기 때문이며, 마테리아를 통해 HP는 증가하지 않게 되어 있습니다.
+
+### 방어력
+
+$$
+\text{Mit}_\text{DEF}(f, l) =  1 - 0.01\left\lfloor\frac{15f}{\gamma_l}\right\rfloor
+$$
+
+$f$, $l$은 각각 방어력, 레벨을 나타냅니다. 방어력은 물리 데미지에 대해서는 물리 방어력 수치가, 마법 데미지에 대해서는 마법 방어력 수치가 사용됩니다.
+
+이 수치 역시 **방어력에 의해서만 결정되며, 다른 스탯에는 영향을 받지 않습니다.** 역시 마테리아를 통해 방어력은 증가하지 않습니다.
+
+최종적인 (생존기 등이 적용되지 않은) 피해 경감 배율은 방어력에 의한 피해 경감 배율에다가 후술할 불굴 배율을 곱한 값입니다.
+
+$$
+\text{Mit}(f, t, l, j) = \text{Mit}_\text{DEF}(f, l) \times \text{Mult}_\text{TEN}(t, l, j)
+$$
+
+### 회복량
+
+회복량은 기본적으로 **위력, 주 스탯 배율, 무기 데미지 배율, 의지 배율, 불굴 배율**을 모두 곱한 값입니다.
+
+$$
+\begin{align*}
+\text{Heal}(m, w, d, t, l, j) = &&\text{Potency}\\
+&\times&\text{Mult}_\text{Main}(m, l, j)\\
+&\times&\text{Mult}_\text{WD}(w, l, j)\\
+&\times&\text{Mult}_\text{DET}(d, l)\\
+&\times&\text{Mult}_\text{TEN}(t, l, j)\\
+\end{align*}
+$$
+
+#### 주 스탯 배율
+
+$$
+\begin{align*}
+\text{Mult}_\text{Main}^\text{Tank}(m, l) &= 1 + 0.01\left\lfloor\left(\frac{m}{B_l^M} - 1\right)\alpha_l^T\right\rfloor\\
+\text{Mult}_\text{Main}^\text{DPS, Healer}(m, l) &= 1 + 0.01\left\lfloor\left(\frac{m}{B_l^M} - 1\right)\alpha_l\right\rfloor
+\end{align*}
+$$
+
+$m$, $l$는 각각 주 스탯, 레벨을 나타냅니다.
+
+#### 무기 데미지 배율
+
+$$
+\text{Mult}_\text{WD}(w, l, j) = 0.01\left(w + \left\lfloor\frac{B_l^M\mu_j}{1000}\right\rfloor\right)
+$$
+
+$w$, $l$, $j$는 각각 무기 데미지, 레벨, 직업을 나타냅니다.
+
+#### 의지 배율
+
+$$
+\text{Mult}_\text{DET}(d, l) = 1 + 0.001\left\lfloor\frac{140(d - B_l^S)}{\gamma_l}\right\rfloor
+$$
+
+$d$, $l$는 각각 의지, 레벨을 나타냅니다.
+
+#### 불굴 배율
+
+$$
+\begin{align*}
+\text{Mult}_\text{TEN}^\text{Tank}(t, l) &=  1 + 0.001\left\lfloor\frac{112(t-B_l^S)}{\gamma_l}\right\rfloor\\
+\text{Mit}_\text{TEN}^\text{Tank}(t, l) &=  1 - 0.001\left\lfloor\frac{200(t-B_l^S)}{\gamma_l}\right\rfloor
+\end{align*}
+$$
+
+$t$, $l$는 각각 불굴, 레벨을 나타냅니다.
+
+참고로, **불굴 스탯은 힐러와 딜러에게는 영향을 주지 않습니다.**
+
+### 기본 스탯
+
+스탯의 계산에는 장비 스탯뿐만 아니라, 장비가 없어도 더해지는 값인 **종족 스탯**과 **기본 스탯**이 존재합니다. 음식 및 약물로 인한 보너스는 이들의 합산 후 적용됩니다.
+하지만, 종족 스탯($\epsilon_\text{Clan}$)은 다른 요소에 비해 매우 작은 영향을 미치기 때문에, 종족 스탯은 무시하고 계산해도 무방합니다.
+
+#### 메인 스탯
+
+$$
+\text{Base}_\text{MS}(l, j) = \left\lfloor\frac{B_l^M\mu_j}{100}\right\rfloor + \epsilon_\text{Clan}
+$$
+
+$l$, $j$는 각각 레벨, 직업을 나타냅니다.
+
+#### 활력
+
+$$
+\text{Base}_\text{VIT}(l, j) = \left\lfloor\frac{B_l^M\nu_j}{100}\right\rfloor + \epsilon_\text{Clan}
+$$
+
+$l$, $j$는 각각 레벨, 직업을 나타냅니다.
+
+#### 기타 모든 스탯
+
+$$
+\begin{align*}
+\text{Base}_\text{M}(l) &= B_l^M\\
+\text{Base}_\text{S}(l) &= B_l^S
+\end{align*}
+$$
+
+$l$는 레벨을 나타냅니다.
+
+## 회귀
+
+안타깝게도, Allagan Studies에서는 아이템 레벨과 장비 스탯의 관계에 대해 다루고 있지 않습니다.
+따라서, 이를 알아내기 위해 직접 [Etro](https://etro.gg) API를 통해 데이터를 수집하고, 회귀 분석을 통해 그 계산식을 추정해 보았습니다.
+다음은 회귀 분석을 통해 얻은 결과입니다.
+
+### 장비 스탯
+
+장비 스탯을 추정하기 위한 간단한 회귀 모델을 다음과 같이 정의합니다.
+
+$$
+\text{Stat}(i, s, l, j) = y_{i, s, l, j} = C_{s, l, j} \exp(\zeta_{l, j} i) + \epsilon
+$$
+
+$i$, $s$, $l$, $j$는 각각 아이템 레벨, 아이템 슬롯, 레벨, 직업을 나타냅니다.
+
+살짝의 자유도 감소가 있긴 하지만 기본적으로 변형된 선형 회귀 모델이기에, 목적 함수를 MSE로 잡으면, 이 회귀 모델은 closed-form solution을 가지게 됩니다.
+관심 있으신 분들은 간단한 편미분으로 구할 수 있으니 한 번 해보시기 바랍니다.
+
+$$
+\begin{align*}
+\mathcal{L}(C_{l, j}, \zeta_{l, j}) &= \sum_{i, s} \left(\log y_{i, s, l, j} - \log C_{s, l, j} - \zeta_{l, j} i\right)^2\\
+\hat{\zeta_{l, j}} &= \frac{\sum_s \left(\mathbb{E}_{i_s}[i_sy_s] - \mathbb{E}_{i_s}[i_s]\mathbb{E}_{i_s}[y_s]\right)}{\sum_s \mathbb{V}_{i_s}[y_s]}\\
+\hat{C_{s, l, j}} &= \exp\left(\mathbb{E}_{i_s}[y_s] - \hat{\zeta_{l, j}}\mathbb{E}_{i_s}[i_s]\right)\\
+&= \exp\left(\mathbb{E}_{i_s}[y_s] - \frac{\sum_s \left(\mathbb{E}_{i_s}[i_sy_s] - \mathbb{E}_{i_s}[i_s]\mathbb{E}_{i_s}[y_s]\right)}{\sum_s \mathbb{V}_{i_s}[y_s]}\mathbb{E}_{i_s}[i_s]\right)
+\end{align*}
+$$
+
+정확한 통계적 분석은 수행하지 않았지만, 회귀 모델은 현재 게임 내 장비들에 대해 **수치 오차 1~2 정도로 통제되는 정확도**를 보이게 되며, 지금부터 보여드릴 표는 회귀 분석 결과입니다.
+재미있게도, 회귀 모델이 **아이템 레벨의 지수 함수**임에도 이 모델은 선형 / 다항식 회귀 모델보다 더 좋은 성능을 보이게 됩니다.
+물론, 테일러 근사에 의해 지수 함수는 국소적으로 선형으로 근사될 수 있으므로, 이 사실 자체를 아이템 레벨의 중요성의 근거로 삼기는 어렵습니다.
+
+Weapon, Major, Minor, Accessory는 각각 무기, 주 장비(몸통 방어구, 다리 방어구), 부 장비(머리 방어구, 손 방어구, 발 방어구), 장신구를 나타냅니다.
+무기와 장신구는 방어력을 제공하지 않으므로, 해당하는 표에서는 생략됩니다.
+
+#### 주 스탯
+
+<div className="overflow-x-scroll max-w-full [&>*]:my-0">
+| Level | $\zeta_{l, j}$ | $C_{s, l, j}$ (Weapon) | $C_{s, l, j}$ (Major) | $C_{s, l, j}$ (Minor) | $C_{s, l, j}$ (Acc.) |
+| ----- | -------------- | ------------------- | ------------------ | ------------------ | ----------------- |
+| 70    | 0.002545       | 53.36               | 51.46              | 32.38              | 25.54             |
+| 80    | 0.002545       | 55.15               | 53.17              | 33.50              | 26.40             |
+| 90    | 0.005408       | 11.54               | 11.12              | 7.003              | 5.525             |
+| 100   | 0.005236       | 13.36               | 12.87              | 8.113              | 6.393             |
+</div>
+
+#### 활력 (탱커)
+
+<div className="overflow-x-scroll max-w-full [&>*]:my-0">
+| Level | $\zeta_{l, j}$ | $C_{s, l, j}$ (Weapon) | $C_{s, l, j}$ (Major) | $C_{s, l, j}$ (Minor) | $C_{s, l, j}$ (Acc.) |
+| ----- | -------------- | ------------------- | ------------------ | ------------------ | ----------------- |
+| 70    | 0.003392       | 40.50               | 39.01              | 24.56              | 19.41             |
+| 80    | 0.003133       | 42.47               | 40.91              | 25.74              | 20.29             |
+| 90    | 0.006475       | 6.362               | 6.137              | 3.861              | 3.042             |
+| 100   | 0.006141       | 7.293               | 7.023              | 4.422              | 3.486             |
+</div>
+
+#### 활력 (힐러)
+
+<div className="overflow-x-scroll max-w-full [&>*]:my-0">
+| Level | $\zeta_{l, j}$ | $C_{s, l, j}$ (Weapon) | $C_{s, l, j}$ (Major) | $C_{s, l, j}$ (Minor) | $C_{s, l, j}$ (Acc.) |
+| ----- | -------------- | ------------------- | ------------------ | ------------------ | ----------------- |
+| 70    | 0.003384       | 36.55               | 35.21              | 22.15              | 17.54             |
+| 80    | 0.003122       | 38.43               | 37.02              | 23.30              | 18.37             |
+| 90    | 0.006470       | 5.746               | 5.543              | 3.488              | 2.748             |
+| 100   | 0.006141       | 6.560               | 6.319              | 3.975              | 3.136             |
+</div>
+
+#### 방어력 (탱커, 물리/마법 공통)
+
+<div className="overflow-x-scroll max-w-full [&>*]:my-0">
+| Level | $\zeta_{l, j}$ | $C_{s, l, j}$ (Major) | $C_{s, l, j}$ (Minor) |
+| ----- | -------------- | ------------------ | ------------------ |
+| 70    | 0.002186       | 236.3              | 176.2              |
+| 80    | 0.002026       | 278.8              | 207.9              |
+| 90    | 0.002203       | 279.6              | 208.5              |
+| 100   | 0.001948       | 369.5              | 275.5              |
+</div>
+
+#### 방어력 (근딜 및 유격대, 물리/마법 공통)
+
+<div className="overflow-x-scroll max-w-full [&>*]:my-0">
+| Level | $\zeta_{l, j}$ | $C_{s, l, j}$ (Major) | $C_{s, l, j}$ (Minor) |
+| ----- | -------------- | ------------------ | ------------------ |
+| 70    | 0.002185       | 130.0              | 97.03              |
+| 80    | 0.002036       | 152.6              | 113.8              |
+| 90    | 0.002205       | 153.6              | 114.6              |
+| 100   | 0.001943       | 203.9              | 152.1              |
+</div>
+
+#### 물리 방어력 (힐러 및 캐스터)
+
+<div className="overflow-x-scroll max-w-full [&>*]:my-0">
+| Level | $\zeta_{l, j}$ | $C_{s, l, j}$ (Major) | $C_{s, l, j}$ (Minor) |
+| ----- | -------------- | ------------------ | ------------------ |
+| 70    | 0.002207       | 93.79              | 69.98              |
+| 80    | 0.002024       | 111.6              | 83.27              |
+| 90    | 0.002207       | 111.5              | 83.24              |
+| 100   | 0.001962       | 146.2              | 109.1              |
+</div>
+
+#### 마법 방어력 (힐러 및 캐스터)
+
+<div className="overflow-x-scroll max-w-full [&>*]:my-0">
+| Level | $\zeta_{l, j}$ | $C_{s, l, j}$ (Major) | $C_{s, l, j}$ (Minor) |
+| ----- | -------------- | ------------------ | ------------------ |
+| 70    | 0.002188       | 165.3              | 123.3              |
+| 80    | 0.002034       | 194.4              | 145.0              |
+| 90    | 0.002204       | 195.5              | 145.8              |
+| 100   | 0.001932       | 261.6              | 195.1              |
+</div>
+
+### 무기 데미지
+
+무기 데미지는 아래와 같은 식으로 계산됩니다. 회귀라 하기엔 너무 간단한 식이며, 수치적으로 정확히 일치합니다.
+
+$$
+\text{WD}(i, l) = \left\lceil A_li + I_l \right\rceil
+$$
+
+$i$, $l$는 각각 아이템 레벨, 레벨을 나타냅니다.
+
+| Level | $A_l$ | $I_l$ |
+| ----- | ----- | ----- |
+| 70    | 0.1   | 52    |
+| 80    | 0.1   | 52    |
+| 90    | 0.2   | -1    |
+| 100   | 0.2   | -1    |
+
+### 의지, 불굴
+
+이 수치의 경우 장비 구성에 따라 매우 다르기 때문에, 일률적인 회귀식을 사용할 수 없습니다. 따라서, 이 수치들에 의한 배율은 임의의 고정값으로 설정하거나, 직접 현재 장비 구성에 따라 계산해야 합니다.
+
+여러 조사를 거친 결과 BiS 장비를 기준으로, **12%(힐러, 딜러), 13%(탱커)** 정도가 경험적으로 적당한 수치라고 사료됩니다.
+
+## 맺으며
+
+숫자를 보면, 몇 가지 비직관적인 사실을 알 수 있습니다.
+
+* 마테리아는 HP 및 방어력에 영향을 주지 않습니다. **즉, 금단을 한다고 덜 아프게 맞지 않습니다.**
+* 근딜과 유격대의 HP와 방어력은 완전히 동일합니다. **즉, 근딜과 유격대는 동일하게 말랑합니다.**
+* 회복량을 높이는 방식은 **의지**를 높이는 것입니다.
+  * 신앙은 이 글에서 다루진 않았지만, 자동 MP 회복 속도에 영향을 주는 수치이며, 회복량에 직접적인 영향을 주지 않습니다.
+  * 극대화 및 직격은 비극대화 회복량에 영향을 주지 않습니다. 물론 회복량의 기댓값은 높아질 수 있지만, Q3에 영향을 주지 않습니다.
+* 물리 방어력이 제일 낮은 직군은 힐러 및 캐스터, 마법 방어력이 제일 낮은 직군은 근딜 및 유격대입니다.
+* 효월의 종언 기준으로, **평균 아이템 레벨 5 차이**는 메인 스탯 및 활력 3% 차이, 방어력 1% 차이; 즉 **피해량 4%, 유효 HP 5% 내외의 차이**를 주게 됩니다.
+  * 즉, 5파츠 템렙 -10 (평균 5 차이) 정도는 실력으로 극복 가능한 범위 내에 있는 건 맞습니다. 이 정도의 장비 불량이라면 조금 더 생각하고 지적하는 것이 바람직하다고 생각합니다.
+  * **근데 무엇보다, 그냥 장비를 맞추는 것이 지표를 올리는 가장 쉬운 방법입니다. 제발 맞춰서 와주세요... 제발...**
+
+사실, 피해량의 경우에도 회복량과 비슷한 방식으로 계산할 수 있지만, 이는 더 복잡한 계산이 필요합니다.
+극대화(CRT) 수치는 극대화 확률 및 극대화 피해량에 영향을 주고, 직격(DH) 수치는 직격 확률 및 직격 피해량에 영향을 줍니다.
+기술 시전 속도(SKS) 또는 마법 시전 속도(SPS)는 글로벌 쿨타임에 계단식으로 영향을 주게 됩니다.
+
+물론, 이들로부터 피해량의 기댓값을 계산할 수 있지만, 이는 직격이나 극대화 수치를 조작하는 여러 파티 시너지에 의해서 유의미하게 변동되며, 기댓값이라는 것은 어디까지나 통계적 대표치 중 하나일 뿐이기에 실질적 의미를 가질지도 의문스럽습니다.
+~~하지만 심심하면 한 번 해보는 것도 나쁘지 않을 것 같긴 합니다.~~
+
+
+## 부록: 구현
+
+TypeScript로는 이런 식으로 구현할 수 있습니다. 이 코드에는 방어력에 대한 계산이 포함되어 있지 않습니다.
+
+```typescript title="lib/calc/estimations.ts"
+import {
+  FOODS,
+  HEALER_VIT_GEAR_REGRESSIONS,
+  JOB_DEPENDENT_PARAMS,
+  LEVEL_DEPENDENT_PARAMS,
+  MAIN_STAT_GEAR_REGRESSIONS,
+  TANK_VIT_GEAR_REGRESSIONS,
+  WEAPON_DAMAGE_REGRESSIONS,
+} from './constants';
+import type { JobBaseline, RegressiveGearStatParams } from './types';
+
+const checkLevelValidity = (level: number): void => {
+  if (![70, 80, 90, 100].includes(level)) {
+    throw new Error(`Invalid level: ${level}`);
+  }
+};
+
+export const estimateHP = (vit: number, level: number, job: JobBaseline): number => {
+  checkLevelValidity(level);
+
+  const { H, B_M, beta, beta_T } = LEVEL_DEPENDENT_PARAMS[level];
+  const { eta } = JOB_DEPENDENT_PARAMS[job];
+  const beta_j = job === 'TANK_BASELINE' ? beta_T : beta;
+
+  return Math.floor((H * eta) / 100) + Math.floor((vit - B_M) * beta_j);
+};
+
+export const estimateMainStatMultiplier = (mainStat: number, level: number, job: JobBaseline): number => {
+  checkLevelValidity(level);
+
+  const { B_M, alpha, alpha_T } = LEVEL_DEPENDENT_PARAMS[level];
+  const alpha_j = job === 'TANK_BASELINE' ? alpha_T : alpha;
+
+  return 1 + 0.01 * Math.floor((mainStat / B_M - 1) * alpha_j);
+};
+
+export const estimateWeaponDamageMultiplier = (weaponDamage: number, level: number, job: JobBaseline): number => {
+  checkLevelValidity(level);
+
+  const { B_M } = LEVEL_DEPENDENT_PARAMS[level];
+  const { mu } = JOB_DEPENDENT_PARAMS[job];
+
+  return 0.01 * (weaponDamage + Math.floor((B_M * mu) / 1000));
+};
+
+export const estimateSubStatMultiplier = (job: JobBaseline): number => {
+  return job === 'TANK_BASELINE' ? 1.13 : 1.12;
+};
+
+export const estimateBaseMainStat = (level: number, job: JobBaseline): number => {
+  checkLevelValidity(level);
+
+  const { B_M } = LEVEL_DEPENDENT_PARAMS[level];
+  const { mu } = JOB_DEPENDENT_PARAMS[job];
+
+  return Math.floor((B_M * mu) / 100);
+};
+
+export const estimateBaseVIT = (level: number, job: JobBaseline): number => {
+  checkLevelValidity(level);
+
+  const { B_S } = LEVEL_DEPENDENT_PARAMS[level];
+  const { nu } = JOB_DEPENDENT_PARAMS[job];
+
+  return Math.floor((B_S * nu) / 100);
+};
+
+export const aggreagateRegressiveGearStatParams = (params: RegressiveGearStatParams): { zeta: number; C: number } => {
+  const { zeta, C_weapon, C_major_piece, C_minor_piece, C_accessory } = params;
+
+  return {
+    zeta,
+    C: C_weapon + C_major_piece * 2 + C_minor_piece * 3 + C_accessory * 5,
+  };
+};
+
+export const estimateGearMainStat = (itemLevel: number, level: number): number => {
+  checkLevelValidity(level);
+
+  const { zeta, C } = aggreagateRegressiveGearStatParams(MAIN_STAT_GEAR_REGRESSIONS[level]);
+
+  return C * Math.exp(zeta * itemLevel);
+};
+
+export const estimateGearVIT = (itemLevel: number, level: number, job: JobBaseline): number => {
+  checkLevelValidity(level);
+
+  const { zeta, C } = aggreagateRegressiveGearStatParams(
+    (job === 'TANK_BASELINE' ? TANK_VIT_GEAR_REGRESSIONS : HEALER_VIT_GEAR_REGRESSIONS)[level],
+  );
+
+  return C * Math.exp(zeta * itemLevel);
+};
+
+export const estimateWeaponDamage = (itemLevel: number, level: number): number => {
+  checkLevelValidity(level);
+
+  const { A, I } = WEAPON_DAMAGE_REGRESSIONS[level];
+
+  return Math.ceil(A * itemLevel + I);
+};
+
+export const applyFoodBonus = (vit: number, version: number, subversion: number) => {
+  for (const { available_version, available_subversion, max_vit_bonus, ratio } of FOODS) {
+    if ((version === available_version && subversion >= available_subversion) || version > available_version) {
+      return Math.min(vit + max_vit_bonus, Math.floor(vit * ratio));
+    }
+  }
+
+  return vit;
+};
+
+export const estimatePartyBonus = (num_diverse_roles: number): number => {
+  return 1 + 0.01 * num_diverse_roles;
+};
+
+export const estimateAll = (
+  itemLevel: number,
+  level: number,
+  version: number,
+  subversion: number,
+  num_diverse_roles: number,
+) => {
+  const partyBonus = estimatePartyBonus(num_diverse_roles);
+
+  const weaponDamage = estimateWeaponDamage(itemLevel, level);
+
+  const mainStatHealer = estimateGearMainStat(itemLevel, level) + estimateBaseMainStat(level, 'HEALER_BASELINE');
+  const mainStatTank = estimateGearMainStat(itemLevel, level) + estimateBaseMainStat(level, 'TANK_BASELINE');
+
+  const mainStatHealerOL = mainStatHealer * partyBonus;
+  const mainStatTankOL = mainStatTank * partyBonus;
+
+  const vitHealer = estimateGearVIT(itemLevel, level, 'HEALER_BASELINE') + estimateBaseVIT(level, 'HEALER_BASELINE');
+  const vitTank = estimateGearVIT(itemLevel, level, 'TANK_BASELINE') + estimateBaseVIT(level, 'TANK_BASELINE');
+
+  const vitHealerWithFood = applyFoodBonus(vitHealer, version, subversion);
+  const vitTankWithFood = applyFoodBonus(vitTank, version, subversion);
+
+  const vitHealerOL = vitHealerWithFood * partyBonus;
+  const vitTankOL = vitTankWithFood * partyBonus;
+
+  const hpHealer = estimateHP(vitHealerOL, level, 'HEALER_BASELINE');
+  const hpTank = estimateHP(vitTankOL, level, 'TANK_BASELINE');
+
+  const mainStatMultiplierHealer = estimateMainStatMultiplier(mainStatHealerOL, level, 'HEALER_BASELINE');
+  const mainStatMultiplierTank = estimateMainStatMultiplier(mainStatTankOL, level, 'TANK_BASELINE');
+
+  const weaponDamageMultiplierHealer = estimateWeaponDamageMultiplier(weaponDamage, level, 'HEALER_BASELINE');
+  const weaponDamageMultiplierTank = estimateWeaponDamageMultiplier(weaponDamage, level, 'TANK_BASELINE');
+
+  const subStatMultiplierHealer = estimateSubStatMultiplier('HEALER_BASELINE');
+  const subStatMultiplierTank = estimateSubStatMultiplier('TANK_BASELINE');
+
+  const potencyCoefficientHealer = mainStatMultiplierHealer * weaponDamageMultiplierHealer * subStatMultiplierHealer;
+  const potencyCoefficientTank = mainStatMultiplierTank * weaponDamageMultiplierTank * subStatMultiplierTank;
+
+  return {
+    partyBonus,
+    hpHealer,
+    hpTank,
+    potencyCoefficientHealer,
+    potencyCoefficientTank,
+  };
+};
+```
+
+코드를 보면, `estimateAll` 함수가 모든 계산을 수행하고, 이 함수의 인자 중 개인과 관계된 것은 아이템 레벨, 레벨 정도밖에 없게 됩니다.

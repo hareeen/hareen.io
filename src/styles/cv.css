@@ -1,0 +1,7 @@
+.prose p:has(+ ul) {
+  margin-bottom: 0;
+}
+
+.prose p + ul {
+  margin-top: 0;
+}

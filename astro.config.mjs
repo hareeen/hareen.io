@@ -11,7 +11,7 @@ import remarkMath from "remark-math";
 import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeKatex from 'rehype-katex';
 import rehypeMermaid from 'rehype-mermaid';
-import rehypeResponsiveMermaid from "./src/plugins/rehype-responsive-mermaid";
+import rehypeResponsiveMermaid from "./src/plugins/rehype-responsive.mermaid";
 
 /** @type {import('rehype-pretty-code').Options} */
 const rehypePrettyCodeOptions = {

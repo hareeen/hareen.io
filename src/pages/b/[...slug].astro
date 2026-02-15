@@ -1,0 +1,131 @@
+---
+import { type CollectionEntry, getCollection, render } from "astro:content";
+import { DateTime } from "luxon";
+import Comments from "@/components/Comments.astro";
+import DirectoryListing from "@/components/DirectoryListing.astro";
+import ProseArticle from "@/components/ProseArticle.astro";
+import MainLayout from "@/layouts/MainLayout.astro";
+import {
+    buildTree,
+    collectDirectorySlugs,
+    findSubtree,
+    flatten,
+} from "@/lib/post-tree";
+
+type PostProps = { kind: "post"; post: CollectionEntry<"posts"> };
+type DirProps = { kind: "directory"; dirSlug: string };
+
+export async function getStaticPaths() {
+    const posts = await getCollection("posts");
+    const root = buildTree(posts);
+
+    const postPaths = posts.map((post) => ({
+        params: { slug: post.id },
+        props: { kind: "post" as const, post },
+    }));
+
+    const dirSlugs = collectDirectorySlugs(root);
+    const dirPaths = [
+        {
+            params: { slug: undefined },
+            props: { kind: "directory" as const, dirSlug: "" },
+        },
+        ...dirSlugs.map((slug) => ({
+            params: { slug },
+            props: { kind: "directory" as const, dirSlug: slug },
+        })),
+    ];
+
+    return [...postPaths, ...dirPaths];
+}
+
+const props = Astro.props as PostProps | DirProps;
+
+let pageTitle: string | undefined;
+let pageDescription: string | undefined;
+let postContent: Awaited<ReturnType<typeof render>> | null = null;
+let postData: CollectionEntry<"posts">["data"] | null = null;
+let breadcrumbs: string[][] = [];
+let dirEntries: import("@/lib/post-tree").FlatEntry[] = [];
+let dirBreadcrumbs: string[][] = [];
+
+if (props.kind === "post") {
+    const { post } = props;
+    postContent = await render(post);
+    postData = post.data;
+    pageTitle = post.data.title;
+    pageDescription = post.data.description;
+
+    const slugParts = post.id.split("/");
+    const subpaths: string[][] = [[]];
+    for (const part of slugParts) {
+        subpaths.push([...subpaths[subpaths.length - 1], part]);
+    }
+    breadcrumbs = subpaths.slice(0, -1);
+} else {
+    const { dirSlug } = props;
+    const posts = await getCollection("posts");
+    const root = buildTree(posts);
+
+    if (dirSlug === "") {
+        dirEntries = flatten(root);
+        dirBreadcrumbs = [[]];
+    } else {
+        const slugParts = dirSlug.split("/");
+        pageTitle = `blog - ${slugParts[slugParts.length - 1]}`;
+        const subtree = findSubtree(root, slugParts);
+        dirEntries = subtree ? flatten(subtree) : [];
+
+        const subpaths: string[][] = [[]];
+        for (const part of slugParts) {
+            subpaths.push([...subpaths[subpaths.length - 1], part]);
+        }
+        dirBreadcrumbs = subpaths;
+    }
+}
+
+const Content = postContent?.Content;
+---
+
+<MainLayout title={pageTitle} description={pageDescription}>
+    {
+        props.kind === "post" && postData && Content ? (
+            <>
+                <ProseArticle class="[&>*:nth-child(4)]:mt-0">
+                    <p class="text-muted-foreground md:text-sm text-xs mb-0 max-md:mb-0 prose-a:text-muted-foreground prose-a:no-underline">
+                        {breadcrumbs.map((path) => (
+                            <>
+                                <a
+                                    href={`/b/${path.join("/")}`}
+                                    class="hover:underline"
+                                >
+                                    {path.length === 0
+                                        ? "~"
+                                        : path[path.length - 1]}
+                                </a>
+                                {" / "}
+                            </>
+                        ))}
+                    </p>
+                    <h1 class="mt-2 max-md:mt-1.5 mb-0 max-md:mb-0 print:mb-2 print:max-md:mb-1.5">
+                        {postData.title}
+                    </h1>
+                    <p class="text-muted-foreground md:text-sm text-xs mt-2 max-md:mt-1.5 mb-6 max-md:mb-5 font-medium print:hidden">
+                        {DateTime.fromJSDate(postData.date).toLocaleString(
+                            DateTime.DATE_MED,
+                        )}
+                    </p>
+                    <Content />
+                </ProseArticle>
+                <Comments />
+            </>
+        ) : (
+            <ProseArticle>
+                <DirectoryListing
+                    breadcrumbs={dirBreadcrumbs}
+                    entries={dirEntries}
+                />
+            </ProseArticle>
+        )
+    }
+</MainLayout>

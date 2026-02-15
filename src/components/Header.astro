@@ -1,0 +1,23 @@
+---
+import { ThemeSwitcher } from "./ThemeSwitcher";
+---
+
+<!-- Print-only header -->
+<div class="hidden absolute top-8 right-0 print:block">
+    <a href="/">
+        <h3 class="text-xl font-bold font-unset">✦</h3>
+    </a>
+</div>
+
+<!-- Screen header -->
+<div class="my-4 flex items-center print:hidden">
+    <a href="/">
+        <h3
+            class="text-xl font-bold hover:text-[#7654ff] transition-all font-unset"
+        >
+            ✦
+        </h3>
+    </a>
+    <div class="grow"></div>
+    <ThemeSwitcher client:load />
+</div>

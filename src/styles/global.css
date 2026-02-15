@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -116,22 +117,22 @@
 
 /* font */
 @font-face {
-  font-family: "Pretendard Variable";
+  font-family: "Wanted Sans Variable";
   font-weight: 45 920;
   font-style: normal;
   font-display: swap;
-  src: url("/fonts/PretendardVariable.woff2") format("woff2-variations");
+  src: url("/fonts/WantedSansVariable.woff2") format("woff2-variations");
 }
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border outline-ring/5;
     font-synthesis: none !important;
   }
   body {
     font-family:
-      "Pretendard Variable", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Noto Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-    @apply bg-background text-foreground break-keep;
+      "Wanted Sans Variable", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Noto Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    @apply bg-background text-foreground break-keep antialiased;
   }
 }
 
@@ -160,7 +161,7 @@
 
 /* code block: theme support */
 
-.light .prose pre[data-theme*=" "] span {
+.prose pre[data-theme*=" "] span {
   color: var(--shiki-light);
 }
 
@@ -194,11 +195,11 @@
 /* code block: line highlight */
 
 .prose code span[data-highlighted-line] {
-  @apply bg-opacity-25 bg-[#7654ff] border-l-4 border-[#7654ff] pl-[calc(1rem-4px)];
+  @apply bg-[#7654ff]/25 border-l-4 border-[#7654ff] pl-[calc(1rem-4px)];
 }
 
 .prose mark[data-highlighted-chars] {
-  @apply bg-opacity-50 bg-yellow-500;
+  @apply bg-yellow-500/50;
 }
 
 /* code block: title */
@@ -216,7 +217,7 @@
   @apply overflow-x-scroll overflow-y-clip;
 }
 
-.prose .katex-mathml {
+.prose .katex-html {
   @apply hidden;
 }
 
@@ -243,5 +244,5 @@
 }
 
 ::selection {
-  @apply bg-opacity-50 bg-[#7654ff];
+  @apply bg-[#7654ff]/50;
 }
