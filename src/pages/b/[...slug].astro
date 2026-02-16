@@ -1,4 +1,5 @@
 ---
+
 import { type CollectionEntry, getCollection, render } from "astro:content";
 import { DateTime } from "luxon";
 import Comments from "@/components/Comments.astro";
@@ -70,9 +71,10 @@ if (props.kind === "post") {
     if (dirSlug === "") {
         dirEntries = flatten(root);
         dirBreadcrumbs = [[]];
+        pageTitle = "Blog";
     } else {
         const slugParts = dirSlug.split("/");
-        pageTitle = `blog - ${slugParts[slugParts.length - 1]}`;
+        pageTitle = `Blog - ${slugParts[slugParts.length - 1]}`;
         const subtree = findSubtree(root, slugParts);
         dirEntries = subtree ? flatten(subtree) : [];
 

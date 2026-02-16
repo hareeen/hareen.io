@@ -1,68 +1,71 @@
 ---
 import "@/styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+
+const titleSuffix = "✦ hareen.io";
 ---
 
 <html lang="ko">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <meta name="generator" content={Astro.generator} />
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title ? `${title} | ${titleSuffix}` : titleSuffix}</title>
+    {description && <meta name="description" content={description} />}
 
-        <!-- Theme initialization script to prevent FOUC -->
-        <script is:inline>
-            const getThemePreference = () => {
-                if (
-                    typeof localStorage !== "undefined" &&
-                    localStorage.getItem("theme")
-                ) {
-                    return localStorage.getItem("theme");
-                }
-                return window.matchMedia("(prefers-color-scheme: dark)").matches
-                    ? "dark"
-                    : "light";
-            };
-            const isDark = getThemePreference() === "dark";
-            document.documentElement.classList[isDark ? "add" : "remove"](
-                "dark",
-            );
+    <!-- Theme initialization script to prevent FOUC -->
+    <script is:inline>
+      const getThemePreference = () => {
+        if (
+          typeof localStorage !== "undefined" &&
+          localStorage.getItem("theme")
+        ) {
+          return localStorage.getItem("theme");
+        }
+        return window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light";
+      };
+      const isDark = getThemePreference() === "dark";
+      document.documentElement.classList[isDark ? "add" : "remove"]("dark");
 
-            let meta = document.querySelector('meta[name="color-scheme"]');
+      let meta = document.querySelector('meta[name="color-scheme"]');
+      meta = document.createElement("meta");
+      meta.setAttribute("name", "color-scheme");
+      document.head.appendChild(meta);
+      meta.setAttribute("content", isDark ? "dark light" : "light dark");
+
+      if (typeof localStorage !== "undefined") {
+        const observer = new MutationObserver(() => {
+          const isDark = document.documentElement.classList.contains("dark");
+          localStorage.setItem("theme", isDark ? "dark" : "light");
+
+          let meta = document.querySelector('meta[name="color-scheme"]');
+          if (!meta) {
             meta = document.createElement("meta");
             meta.setAttribute("name", "color-scheme");
             document.head.appendChild(meta);
-            meta.setAttribute("content", isDark ? "dark light" : "light dark");
+          }
+          meta.setAttribute("content", isDark ? "dark light" : "light dark");
+        });
+        observer.observe(document.documentElement, {
+          attributes: true,
+          attributeFilter: ["class"],
+        });
+      }
+    </script>
 
-            if (typeof localStorage !== "undefined") {
-                const observer = new MutationObserver(() => {
-                    const isDark =
-                        document.documentElement.classList.contains("dark");
-                    localStorage.setItem("theme", isDark ? "dark" : "light");
-
-                    let meta = document.querySelector(
-                        'meta[name="color-scheme"]',
-                    );
-                    if (!meta) {
-                        meta = document.createElement("meta");
-                        meta.setAttribute("name", "color-scheme");
-                        document.head.appendChild(meta);
-                    }
-                    meta.setAttribute(
-                        "content",
-                        isDark ? "dark light" : "light dark",
-                    );
-                });
-                observer.observe(document.documentElement, {
-                    attributes: true,
-                    attributeFilter: ["class"],
-                });
-            }
-        </script>
-
-        <slot name="head" />
-    </head>
-
-    <body>
-        <slot />
-    </body>
+    <slot name="head" />
+  </head>
 </html>
+
+<body>
+  <slot />
+</body>

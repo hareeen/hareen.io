@@ -1,16 +1,16 @@
 ---
 interface Props {
-    class?: string;
+  class?: string;
 }
 
 const className = Astro.props.class ?? "";
 ---
 
 <article
-    class:list={[
-        "prose max-md:prose-sm prose-zinc dark:prose-invert my-8 min-w-full overflow-clip",
-        className,
-    ]}
+  class:list={[
+    "prose max-md:prose-sm prose-zinc dark:prose-invert my-8 min-w-full overflow-clip",
+    className,
+  ]}
 >
-    <slot />
+  <slot />
 </article>

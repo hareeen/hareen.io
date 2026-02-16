@@ -4,20 +4,20 @@ import Header from "@/components/Header.astro";
 import BaseLayout from "./BaseLayout.astro";
 
 interface Props {
-    title?: string;
-    description?: string;
+  title?: string;
+  description?: string;
 }
 
 const { title, description } = Astro.props;
 ---
 
 <BaseLayout title={title} description={description}>
-    <slot name="head" slot="head" />
-    <main class="flex min-h-screen flex-col items-center px-4">
-        <div class="w-full max-w-2xl print:max-w-full relative">
-            <Header />
-            <slot />
-            <Footer />
-        </div>
-    </main>
+  <slot name="head" slot="head" />
+  <main class="flex min-h-screen flex-col items-center px-4">
+    <div class="w-full max-w-2xl print:max-w-full relative">
+      <Header />
+      <slot />
+      <Footer />
+    </div>
+  </main>
 </BaseLayout>

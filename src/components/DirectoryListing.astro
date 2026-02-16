@@ -5,70 +5,63 @@ import FolderIcon from "@/components/icons/FolderIcon.astro";
 import type { FlatEntry } from "@/lib/post-tree";
 
 interface Props {
-    breadcrumbs: string[][];
-    entries: FlatEntry[];
+  breadcrumbs: string[][];
+  entries: FlatEntry[];
 }
 
 const { breadcrumbs, entries } = Astro.props;
 ---
 
 <table class="mt-4">
-    <thead class="prose-th:text-left">
-        <tr>
-            <th>
-                <span class="prose-a:no-underline">
-                    {
-                        breadcrumbs.map((path, idx) => (
-                            <>
-                                <a
-                                    href={`/b/${path.join("/")}`}
-                                    class="hover:underline"
-                                >
-                                    {path.length === 0
-                                        ? "~"
-                                        : path[path.length - 1]}
-                                </a>
-                                {idx !== breadcrumbs.length - 1 && " / "}
-                            </>
-                        ))
-                    }
-                </span>
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        {
-            entries.map(({ node, depth }) => (
-                <tr>
-                    <td>
-                        <div style={`padding-left: ${1.5 * depth}rem`}>
-                            {node.type === "directory" ? (
-                                <FolderIcon class="inline-block md:mr-1.5 md:size-4 mr-1 size-3" />
-                            ) : (
-                                <FileTextIcon class="inline-block md:mr-1.5 md:size-4 mr-1 size-3" />
-                            )}
-                            <a href={`/b/${node.slug}`}>
-                                {node.type === "file" ? node.title : node.name}
-                            </a>
-                        </div>
-                    </td>
-                    <td class="text-right md:min-w-28 min-w-24">
-                        {node.type === "file" &&
-                            node.date &&
-                            DateTime.fromJSDate(node.date).toLocaleString(
-                                DateTime.DATE_MED,
-                            )}
-                    </td>
-                </tr>
+  <thead class="prose-th:text-left">
+    <tr>
+      <th>
+        <span class="prose-a:no-underline">
+          {
+            breadcrumbs.map((path, idx) => (
+              <>
+                <a href={`/b/${path.join("/")}`} class="hover:underline">
+                  {path.length === 0 ? "~" : path[path.length - 1]}
+                </a>
+                {idx !== breadcrumbs.length - 1 && " / "}
+              </>
             ))
-        }
-    </tbody>
+          }
+        </span>
+      </th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {
+      entries.map(({ node, depth }) => (
+        <tr>
+          <td>
+            <div style={`padding-left: ${1.5 * depth}rem`}>
+              {node.type === "directory" ? (
+                <FolderIcon class="inline-block md:mr-1.5 md:size-4 mr-1 size-3" />
+              ) : (
+                <FileTextIcon class="inline-block md:mr-1.5 md:size-4 mr-1 size-3" />
+              )}
+              <a href={`/b/${node.slug}`}>
+                {node.type === "file" ? node.title : node.name}
+              </a>
+            </div>
+          </td>
+          <td class="text-right md:min-w-28 min-w-24">
+            {node.type === "file" &&
+              node.date &&
+              DateTime.fromJSDate(node.date).toLocaleString(DateTime.DATE_MED)}
+          </td>
+        </tr>
+      ))
+    }
+  </tbody>
 </table>
 {
-    entries.length === 0 && (
-        <div class="md:text-sm text-xs w-full text-center text-muted-foreground mb-12">
-            이곳엔 아무것도 없어요!
-        </div>
-    )
+  entries.length === 0 && (
+    <div class="md:text-sm text-xs w-full text-center text-muted-foreground mb-12">
+      이곳엔 아무것도 없어요!
+    </div>
+  )
 }

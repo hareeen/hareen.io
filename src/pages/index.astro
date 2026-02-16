@@ -1,4 +1,5 @@
 ---
+
 import { Content } from "@/../content/pages/index.mdx";
 import VerticalDividerIcon from "@/components/icons/VerticalDividerIcon.astro";
 import ProseArticle from "@/components/ProseArticle.astro";
@@ -6,15 +7,15 @@ import MainLayout from "@/layouts/MainLayout.astro";
 ---
 
 <MainLayout>
-    <ProseArticle>
-        <Content />
+  <ProseArticle>
+    <Content />
 
-        <p class="flex gap-2 items-center">
-            <a href="/cv">자세한 이력</a>
-            <VerticalDividerIcon class="inline size-4" />
-            <a href="/links">연락처 및 링크</a>
-            <VerticalDividerIcon class="inline size-4" />
-            <a href="/b">블로그</a>
-        </p>
-    </ProseArticle>
+    <p class="flex gap-2 items-center">
+      <a href="/cv">자세한 이력</a>
+      <VerticalDividerIcon class="inline size-4" />
+      <a href="/links">연락처 및 링크</a>
+      <VerticalDividerIcon class="inline size-4" />
+      <a href="/b">블로그</a>
+    </p>
+  </ProseArticle>
 </MainLayout>

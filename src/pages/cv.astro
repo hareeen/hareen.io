@@ -6,28 +6,44 @@ import { Content } from "@/../content/pages/cv.mdx";
 import VerticalDividerIcon from "@/components/icons/VerticalDividerIcon.astro";
 
 const TEL: string | undefined = undefined;
+
+const currentDate = new Date();
+const version = `${String(currentDate.getFullYear()).slice(2)}${String(
+  currentDate.getMonth() + 1,
+).padStart(2, "0")}${String(currentDate.getDate()).padStart(2, "0")}`;
+const printTitle = `CV_${version}`;
 ---
 
-<MainLayout
-    title="황수영 Suyoung Hwang"
-    description="이력서 - 황수영 Suyoung Hwang"
->
-    <ProseArticle>
-        <h2 class="print:hidden">이력</h2>
-        <h2 class="hidden print:block print:mb-2">황수영 Suyoung Hwang</h2>
-        <p class="hidden print:flex gap-1.5 items-center text-sm">
-            <a href="mailto:me@hareen.io">me@hareen.io</a>
+<MainLayout title="CV">
+  <ProseArticle>
+    <h2 class="print:hidden">이력</h2>
+    <h2 class="hidden print:block print:mb-2">황수영 Suyoung Hwang</h2>
+    <p class="hidden print:flex gap-1.5 items-center text-sm">
+      <a href="mailto:me@hareen.io">me@hareen.io</a>
+      <VerticalDividerIcon class="inline size-0.875rem" />
+      <a href="https://github.com/hareeen">github.com/hareeen</a>
+      {
+        TEL && (
+          <>
             <VerticalDividerIcon class="inline size-0.875rem" />
-            <a href="https://github.com/hareeen">github.com/hareeen</a>
-            {
-                TEL && (
-                    <>
-                        <VerticalDividerIcon class="inline size-0.875rem" />
-                        <a href={`tel:${TEL}`}>{TEL}</a>
-                    </>
-                )
-            }
-        </p>
-        <Content />
-    </ProseArticle>
+            <a href={`tel:${TEL}`}>{TEL}</a>
+          </>
+        )
+      }
+    </p>
+    <Content />
+  </ProseArticle>
 </MainLayout>
+
+<script is:inline define:vars={{ printTitle }}>
+  let original = null;
+
+  window.addEventListener("beforeprint", () => {
+    original = document.title;
+    document.title = printTitle;
+  });
+
+  window.addEventListener("afterprint", () => {
+    document.title = original || document.title;
+  });
+</script>
