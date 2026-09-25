@@ -118,7 +118,7 @@
 /* font */
 @font-face {
   font-family: "Wanted Sans Variable";
-  font-weight: 45 920;
+  font-weight: 400 1000;
   font-style: normal;
   font-display: swap;
   src: url("/fonts/WantedSansVariable.woff2") format("woff2-variations");

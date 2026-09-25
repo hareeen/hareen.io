@@ -12,6 +12,7 @@ import remarkMath from "remark-math";
 import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeKatex from 'rehype-katex';
 import rehypeMermaid from 'rehype-mermaid';
+import fontSubset from "./src/integrations/font-subset";
 import rehypeResponsiveMermaid from "./src/plugins/rehype-responsive.mermaid";
 
 /** @type {import('rehype-pretty-code').Options} */
@@ -44,7 +45,14 @@ export default defineConfig({
     plugins: [tailwindcss(), svgr()],
   },
 
-  integrations: [mdx(), react()],
+  integrations: [
+    mdx(),
+    react(),
+    fontSubset({
+      source: new URL("./src/assets/fonts/WantedSansVariable.woff2", import.meta.url),
+      publicPath: "/fonts/WantedSansVariable.woff2",
+    }),
+  ],
 
   markdown: {
     syntaxHighlight: false,
