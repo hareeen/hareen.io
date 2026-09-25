@@ -127,6 +127,7 @@
 @layer base {
   * {
     @apply border-border outline-ring/5;
+    /* biome-ignore lint/complexity/noImportantStyles: a base-layer declaration can only beat unlayered styles when marked important */
     font-synthesis: none !important;
   }
   body {
