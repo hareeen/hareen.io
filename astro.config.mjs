@@ -7,6 +7,7 @@ import { defineConfig } from "astro/config";
 import mdx from "@astrojs/mdx";
 import react from "@astrojs/react";
 
+import { unified } from "@astrojs/markdown-remark";
 import remarkMath from "remark-math";
 import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeKatex from 'rehype-katex';
@@ -39,14 +40,16 @@ export default defineConfig({
   integrations: [mdx(), react()],
 
   markdown: {
-    gfm: true,
     syntaxHighlight: false,
-    remarkPlugins: [remarkMath],
-    rehypePlugins: [
-      [rehypeMermaid, rehypeMermaidOptions],
-      [rehypePrettyCode, rehypePrettyCodeOptions],
-      rehypeResponsiveMermaid,
-      rehypeKatex
-    ],
+    processor: unified({
+      gfm: true,
+      remarkPlugins: [remarkMath],
+      rehypePlugins: [
+        [rehypeMermaid, rehypeMermaidOptions],
+        [rehypePrettyCode, rehypePrettyCodeOptions],
+        rehypeResponsiveMermaid,
+        rehypeKatex
+      ],
+    }),
   }
 });
