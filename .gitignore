@@ -22,3 +22,9 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# nix
+.direnv/
+result
+result-*
+.pre-commit-config.yaml

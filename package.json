@@ -22,7 +22,7 @@
     "katex": "^0.16.39",
     "lucide-react": "^0.577.0",
     "luxon": "^3.7.2",
-    "playwright": "^1.58.2",
+    "playwright": "1.62.1",
     "radix-ui": "^1.4.3",
     "rehype-katex": "^7.0.1",
     "rehype-mermaid": "^3.0.0",
