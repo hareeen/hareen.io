@@ -43,22 +43,20 @@ export function ThemeSwitcher(props: ThemeSwitcherProps) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <div className="cursor-pointer">
-          <SunIcon
-            width={width}
-            height={height}
-            strokeWidth={strokeWidth}
-            className="dark:hidden"
-          />
-          <MoonIcon
-            width={width}
-            height={height}
-            strokeWidth={strokeWidth}
-            className="hidden dark:block"
-          />
-          <span className="sr-only">Toggle Theme</span>
-        </div>
+      <DropdownMenuTrigger className="cursor-pointer">
+        <SunIcon
+          width={width}
+          height={height}
+          strokeWidth={strokeWidth}
+          className="dark:hidden"
+        />
+        <MoonIcon
+          width={width}
+          height={height}
+          strokeWidth={strokeWidth}
+          className="hidden dark:block"
+        />
+        <span className="sr-only">Toggle Theme</span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuCheckboxItem
