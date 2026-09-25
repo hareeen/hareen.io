@@ -26,7 +26,14 @@ const rehypePrettyCodeOptions = {
 /** @type {import('rehype-mermaid').RehypeMermaidOptions} */
 const rehypeMermaidOptions = {
   strategy: 'img-svg',
-  dark: true,
+  mermaidConfig: {
+    theme: 'neutral',
+    themeVariables: {
+      actorLineColor: '#6b7280',
+      labelBoxBorderColor: '#4b5563',
+    },
+  },
+  dark: { theme: 'dark' },
 };
 
 // https://astro.build/config
