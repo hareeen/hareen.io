@@ -156,7 +156,7 @@ $f$, $l$은 각각 방어력, 레벨을 나타냅니다. 방어력은 물리 데
 최종적인 (생존기 등이 적용되지 않은) 피해 경감 배율은 방어력에 의한 피해 경감 배율에다가 후술할 불굴 배율을 곱한 값입니다.
 
 $$
-\text{Mit}(f, t, l, j) = \text{Mit}_\text{DEF}(f, l) \times \text{Mult}_\text{TEN}(t, l, j)
+\text{Mit}(f, t, l, j) = \text{Mit}_\text{DEF}(f, l) \times \text{Mit}_\text{TEN}(t, l, j)
 $$
 
 ### 회복량
@@ -165,11 +165,11 @@ $$
 
 $$
 \begin{align*}
-\text{Heal}(m, w, d, t, l, j) = &&\text{Potency}\\
-&\times&\text{Mult}_\text{Main}(m, l, j)\\
-&\times&\text{Mult}_\text{WD}(w, l, j)\\
-&\times&\text{Mult}_\text{DET}(d, l)\\
-&\times&\text{Mult}_\text{TEN}(t, l, j)\\
+\text{Heal}(m, w, d, t, l, j) = \text{Potency}
+&\times \text{Mult}_\text{Main}(m, l, j)\\
+&\times \text{Mult}_\text{WD}(w, l, j)\\
+&\times \text{Mult}_\text{DET}(d, l)\\
+&\times \text{Mult}_\text{TEN}(t, l, j)
 \end{align*}
 $$
 
@@ -195,7 +195,7 @@ $w$, $l$, $j$는 각각 무기 데미지, 레벨, 직업을 나타냅니다.
 #### 의지 배율
 
 $$
-\text{Mult}_\text{DET}(d, l) = 1 + 0.001\left\lfloor\frac{140(d - B_l^S)}{\gamma_l}\right\rfloor
+\text{Mult}_\text{DET}(d, l) = 1 + 0.001\left\lfloor\frac{140(d - B_l^M)}{\gamma_l}\right\rfloor
 $$
 
 $d$, $l$는 각각 의지, 레벨을 나타냅니다.
@@ -256,7 +256,7 @@ $l$는 레벨을 나타냅니다.
 장비 스탯을 추정하기 위한 간단한 회귀 모델을 다음과 같이 정의합니다.
 
 $$
-\text{Stat}(i, s, l, j) = y_{i, s, l, j} = C_{s, l, j} \exp(\zeta_{l, j} i) + \epsilon
+\text{Stat}(i, s, l, j) = y_{i, s, l, j} = C_{s, l, j} \exp(\zeta_{l, j} i + \epsilon)
 $$
 
 $i$, $s$, $l$, $j$는 각각 아이템 레벨, 아이템 슬롯, 레벨, 직업을 나타냅니다.
@@ -266,12 +266,14 @@ $i$, $s$, $l$, $j$는 각각 아이템 레벨, 아이템 슬롯, 레벨, 직업�
 
 $$
 \begin{align*}
-\mathcal{L}(C_{l, j}, \zeta_{l, j}) &= \sum_{i, s} \left(\log y_{i, s, l, j} - \log C_{s, l, j} - \zeta_{l, j} i\right)^2\\
-\hat{\zeta_{l, j}} &= \frac{\sum_s \left(\mathbb{E}_{i_s}[i_sy_s] - \mathbb{E}_{i_s}[i_s]\mathbb{E}_{i_s}[y_s]\right)}{\sum_s \mathbb{V}_{i_s}[y_s]}\\
-\hat{C_{s, l, j}} &= \exp\left(\mathbb{E}_{i_s}[y_s] - \hat{\zeta_{l, j}}\mathbb{E}_{i_s}[i_s]\right)\\
-&= \exp\left(\mathbb{E}_{i_s}[y_s] - \frac{\sum_s \left(\mathbb{E}_{i_s}[i_sy_s] - \mathbb{E}_{i_s}[i_s]\mathbb{E}_{i_s}[y_s]\right)}{\sum_s \mathbb{V}_{i_s}[y_s]}\mathbb{E}_{i_s}[i_s]\right)
+\mathcal{L}(\{C_{s, l, j}\}_s, \zeta_{l, j}) &= \sum_{i, s} \left(\log y_{i, s, l, j} - \log C_{s, l, j} - \zeta_{l, j} i\right)^2\\
+\hat{\zeta}_{l, j} &= \frac{\sum_s n_s \operatorname{Cov}_s(i, \log y)}{\sum_s n_s \operatorname{Var}_s(i)}\\
+\hat{C}_{s, l, j} &= \exp\left(\mathbb{E}_s[\log y] - \hat{\zeta}_{l, j}\,\mathbb{E}_s[i]\right)
 \end{align*}
 $$
+
+$n_s$는 슬롯 $s$의 샘플 수이고, $\mathbb{E}_s$, $\operatorname{Cov}_s$, $\operatorname{Var}_s$는 슬롯 $s$에 속한 장비들에 대한 표본 평균, 공분산, 분산입니다.
+즉, $\zeta_{l, j}$는 슬롯별로 중심화한 데이터를 하나로 모아 구한 기울기이고, $C_{s, l, j}$는 그 기울기를 슬롯별 평균점에 맞춘 절편입니다.
 
 정확한 통계적 분석은 수행하지 않았지만, 회귀 모델은 현재 게임 내 장비들에 대해 **수치 오차 1~2 정도로 통제되는 정확도**를 보이게 되며, 지금부터 보여드릴 표는 회귀 분석 결과입니다.
 재미있게도, 회귀 모델이 **아이템 레벨의 지수 함수**임에도 이 모델은 선형 / 다항식 회귀 모델보다 더 좋은 성능을 보이게 됩니다.
@@ -468,10 +470,10 @@ export const estimateBaseMainStat = (level: number, job: JobBaseline): number =>
 export const estimateBaseVIT = (level: number, job: JobBaseline): number => {
   checkLevelValidity(level);
 
-  const { B_S } = LEVEL_DEPENDENT_PARAMS[level];
+  const { B_M } = LEVEL_DEPENDENT_PARAMS[level];
   const { nu } = JOB_DEPENDENT_PARAMS[job];
 
-  return Math.floor((B_S * nu) / 100);
+  return Math.floor((B_M * nu) / 100);
 };
 
 export const aggreagateRegressiveGearStatParams = (params: RegressiveGearStatParams): { zeta: number; C: number } => {
