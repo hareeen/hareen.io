@@ -196,7 +196,11 @@
 /* code block: line highlight */
 
 .prose code span[data-highlighted-line] {
-  @apply bg-[#7654ff]/25 border-l-4 border-[#7654ff] pl-[calc(1rem-4px)];
+  @apply bg-[oklch(0.891_0.054_285.3)] border-l-4 border-[#7654ff] pl-[calc(1rem-4px)];
+}
+
+.dark .prose code span[data-highlighted-line] {
+  @apply bg-[oklch(0.263_0.079_285.3)];
 }
 
 .prose mark[data-highlighted-chars] {
@@ -240,6 +244,11 @@
   @apply font-semibold;
 }
 
+/* opaque because alpha compositing over the background shifts the hue of #7654ff */
 ::selection {
-  @apply bg-[#7654ff]/50;
+  @apply bg-[oklch(0.783_0.114_285.3)];
+}
+
+.dark ::selection {
+  @apply bg-[oklch(0.376_0.137_285.3)];
 }
