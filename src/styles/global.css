@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import "./palette.css";
 @plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
@@ -48,24 +49,23 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.141 0.005 285.823);
+  --background: var(--bg);
+  --foreground: var(--text);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.141 0.005 285.823);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.141 0.005 285.823);
+  --popover: var(--bg-subtle);
+  --popover-foreground: var(--text);
   --primary: oklch(0.21 0.006 285.885);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.967 0.001 286.375);
   --secondary-foreground: oklch(0.21 0.006 285.885);
   --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.967 0.001 286.375);
-  --accent-foreground: oklch(0.21 0.006 285.885);
+  --muted-foreground: var(--text-muted);
+  --accent: var(--surface-hover);
+  --accent-foreground: var(--text);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.92 0.004 286.32);
   --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.705 0.015 286.067);
+  --ring: var(--focus-ring);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -82,24 +82,15 @@
 }
 
 .dark {
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.985 0 0);
   --card: oklch(0.21 0.006 285.885);
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.21 0.006 285.885);
-  --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.92 0.004 286.32);
   --primary-foreground: oklch(0.21 0.006 285.885);
   --secondary: oklch(0.274 0.006 286.033);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.705 0.015 286.067);
-  --accent: oklch(0.274 0.006 286.033);
-  --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.552 0.016 285.938);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -137,6 +128,25 @@
   }
 }
 
+/* prose */
+
+.prose {
+  --tw-prose-body: var(--text-body);
+  --tw-prose-headings: var(--text);
+  --tw-prose-lead: var(--text-muted);
+  --tw-prose-links: var(--text);
+  --tw-prose-bold: var(--text);
+  --tw-prose-counters: var(--text-muted);
+  --tw-prose-bullets: var(--neutral-7);
+  --tw-prose-hr: var(--line);
+  --tw-prose-quotes: var(--text);
+  --tw-prose-quote-borders: var(--line);
+  --tw-prose-captions: var(--text-muted);
+  --tw-prose-code: var(--text);
+  --tw-prose-th-borders: var(--neutral-7);
+  --tw-prose-td-borders: var(--line);
+}
+
 /* code block: default settings */
 
 .prose pre {
@@ -166,8 +176,10 @@
   color: var(--shiki-light);
 }
 
-.dark .prose pre[data-theme*=" "] span {
-  color: var(--shiki-dark);
+@media screen {
+  .dark .prose pre[data-theme*=" "] span {
+    color: var(--shiki-dark);
+  }
 }
 
 /* code block: line number */
@@ -196,11 +208,7 @@
 /* code block: line highlight */
 
 .prose code span[data-highlighted-line] {
-  @apply bg-[oklch(0.891_0.054_285.3)] border-l-4 border-[#7654ff] pl-[calc(1rem-4px)];
-}
-
-.dark .prose code span[data-highlighted-line] {
-  @apply bg-[oklch(0.263_0.079_285.3)];
+  @apply bg-(--accent-5) border-l-4 border-(--accent-solid) pl-[calc(1rem-4px)];
 }
 
 .prose mark[data-highlighted-chars] {
@@ -244,11 +252,6 @@
   @apply font-semibold;
 }
 
-/* opaque because alpha compositing over the background shifts the hue of #7654ff */
 ::selection {
-  @apply bg-[oklch(0.783_0.114_285.3)];
-}
-
-.dark ::selection {
-  @apply bg-[oklch(0.376_0.137_285.3)];
+  @apply bg-(--accent-7);
 }

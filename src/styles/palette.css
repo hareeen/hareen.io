@@ -1,0 +1,90 @@
+/* One continuous low-chroma warm neutral ramp + one vivid accent ramp (gamut-edge, not cusp). */
+
+:root {
+  --neutral-1: oklch(0.982 0.006 85); /* #fbf9f5 */
+  --neutral-2: oklch(0.968 0.008 85); /* #f7f4ee */
+  --neutral-3: oklch(0.95 0.009 85); /* #f1eee8 */
+  --neutral-4: oklch(0.934 0.01 85); /* #ece9e2 */
+  --neutral-5: oklch(0.917 0.011 85); /* #e7e3dc */
+  --neutral-6: oklch(0.85 0.013 85); /* #d2cdc4 */
+  --neutral-7: oklch(0.788 0.014 85); /* #beb9b0 */
+  --neutral-8: oklch(0.656 0.012 85); /* #949189 */
+  --neutral-9: oklch(0.61 0.01 85); /* #86837d */
+  --neutral-10: oklch(0.572 0.01 85); /* #7b7871 */
+  --neutral-11: oklch(0.504 0.008 85); /* #66645f */
+  --neutral-body: oklch(0.37 0.007 85); /* #413f3c */
+  --neutral-12: oklch(0.243 0.005 85); /* #21201d */
+
+  --accent-1: oklch(0.982 0.009 285.4); /* #f8f8ff */
+  --accent-2: oklch(0.968 0.015 285.4); /* #f3f3ff */
+  --accent-3: oklch(0.95 0.024 285.4); /* #ecedff */
+  --accent-4: oklch(0.934 0.032 285.4); /* #e6e7ff */
+  --accent-5: oklch(0.917 0.041 285.4); /* #e0e0fe */
+  --accent-6: oklch(0.854 0.074 285.4); /* #cac9fe */
+  --accent-7: oklch(0.787 0.111 285.4); /* #b2affe */
+  --accent-8: oklch(0.668 0.16 285.4); /* #8d83f1 */
+  --accent-9: oklch(0.5827 0.2396 285.35); /* #7654ff, sRGB gamut edge */
+  --accent-10: oklch(0.51 0.235 285.4); /* #633be3 */
+  --accent-11: oklch(0.489 0.22 285.4); /* #5d3ad4 */
+  --accent-12: oklch(0.306 0.09 285.4); /* #2c265a */
+}
+
+/* dark tokens are screen-only, so paper always gets the light palette */
+@media screen {
+  .dark {
+    --neutral-1: oklch(0.165 0.005 85); /* #0f0e0c */
+    --neutral-2: oklch(0.192 0.006 85); /* #151411 */
+    --neutral-3: oklch(0.222 0.007 85); /* #1d1b17 */
+    --neutral-4: oklch(0.246 0.008 85); /* #22201c */
+    --neutral-5: oklch(0.27 0.009 85); /* #282622 */
+    --neutral-6: oklch(0.325 0.01 85); /* #37342f */
+    --neutral-7: oklch(0.383 0.011 85); /* #46433d */
+    --neutral-8: oklch(0.484 0.011 85); /* #625e58 */
+    --neutral-9: oklch(0.54 0.01 85); /* #716e68 */
+    --neutral-10: oklch(0.585 0.01 85); /* #7f7c75 */
+    --neutral-11: oklch(0.711 0.01 85); /* #a4a19b */
+    --neutral-body: oklch(0.85 0.009 85); /* #d0cdc7 */
+    --neutral-12: oklch(0.937 0.008 85); /* #eceae4 */
+
+    --accent-1: oklch(0.165 0.015 285.4); /* #0e0d15 */
+    --accent-2: oklch(0.192 0.025 285.4); /* #13131f */
+    --accent-3: oklch(0.222 0.045 285.4); /* #19182f */
+    --accent-4: oklch(0.246 0.06 285.4); /* #1e1b3c */
+    --accent-5: oklch(0.27 0.075 285.4); /* #241f49 */
+    --accent-6: oklch(0.341 0.09 285.4); /* #352f64 */
+    --accent-7: oklch(0.398 0.11 285.4); /* #433b7f */
+    --accent-8: oklch(0.495 0.14 285.4); /* #5c52ad */
+    --accent-9: oklch(0.5827 0.2396 285.35); /* #7654ff, sRGB gamut edge */
+    --accent-10: oklch(0.63 0.204 285.4); /* #826efd */
+    --accent-11: oklch(0.703 0.159 285.4); /* #978efd */
+    --accent-12: oklch(0.917 0.041 285.4); /* #e0e0fe */
+  }
+}
+
+:root {
+  --bg: var(--neutral-1);
+  --bg-subtle: var(--neutral-2);
+  --surface: var(--neutral-3);
+  --surface-hover: var(--neutral-4);
+  --surface-active: var(--neutral-5);
+  --line: var(--neutral-6);
+  --border: var(--line);
+  --border-strong: var(--neutral-8); /* 3:1 */
+  --text-muted: var(--neutral-11);
+  --text-body: var(--neutral-body);
+  --text: var(--neutral-12);
+  --accent-surface: var(--accent-3);
+  --accent-border: var(--accent-7);
+  /* white text: use font-weight >= 500 in dark */
+  --accent-solid: var(--accent-9);
+  --accent-solid-hover: var(--accent-10);
+  --accent-text: var(--accent-11);
+  --focus-ring: var(--accent-9);
+  --on-accent: #fff;
+}
+
+@media print {
+  :root {
+    --bg: #fff;
+  }
+}
